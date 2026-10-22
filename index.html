@@ -28,7 +28,10 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0; overflow-x: hidden;
 }
-@media (hover: hover) and (pointer: fine) { body, a, button, input, textarea { cursor: none; } }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body.splash-cursor-ready, body.splash-cursor-ready a, body.splash-cursor-ready button,
+  body.splash-cursor-ready input, body.splash-cursor-ready textarea { cursor: none; }
+}
 a { color: inherit; text-decoration: none; }
 p { margin: 0; }
 h1, h2, h3 { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: -.03em; line-height: .95; margin: 0; text-wrap: balance; }
@@ -49,12 +52,10 @@ section { padding-block: clamp(72px, 11vw, 150px); }
 .loader-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .progress { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: var(--crimson-hi); transform: scaleX(0); transform-origin: left; z-index: 35; pointer-events: none; }
 
-/* cursor */
-.cursor { position: fixed; left: 0; top: 0; width: 16px; height: 16px; border-radius: 50%; background: #fff; mix-blend-mode: difference; pointer-events: none; z-index: 70; opacity: 0; will-change: transform; transition: opacity .2s; }
-.cursor i { position: absolute; inset: 0; border-radius: 50%; background: inherit; transition: transform .25s; }
-.cursor.on { opacity: 1; }
-.cursor.big i { transform: scale(2.8); }
-@media (hover: none), (pointer: coarse) { .cursor { display: none; } }
+/* splash cursor */
+.splash-cursor { position: fixed; inset: 0; z-index: 70; pointer-events: none; }
+.splash-cursor__canvas { display: block; width: 100%; height: 100%; }
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) { .splash-cursor { display: none; } }
 
 /* top bar + menu */
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 16px; background: linear-gradient(var(--bg), transparent); }
@@ -170,54 +171,48 @@ section { padding-block: clamp(72px, 11vw, 150px); }
 .nopin .step { opacity: 1; } .nopin .step p { max-height: none; margin-top: 10px; }
 
 /* journal */
-.journal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.j-card { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.journal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: clamp(14px, 2vw, 24px); }
+.j-card { display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: clamp(14px, 2vw, 22px); border: 1px solid var(--line); background: var(--surface); overflow: hidden; }
 .j-thumb { aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; background: #070707; border: 1px solid var(--line); position: relative; }
 .j-thumb svg { width: 100%; height: 100%; display: block; transition: transform .8s cubic-bezier(.2,.8,.2,1), filter .5s; filter: grayscale(1) contrast(1.1); }
 .j-card:hover .j-thumb svg { transform: scale(1.1) rotate(1.5deg); filter: none; }
-.j-card h3 { font-size: clamp(24px, 2.6vw, 36px); line-height: 1; }
-.j-card .tag { display: flex; justify-content: space-between; gap: 12px; }
+.j-card h3 { font-size: clamp(22px, 2.3vw, 32px); line-height: 1.12; overflow-wrap: anywhere; }
+.j-card .tag { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; }
 
 /* badges */
-.badges { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.badge { aspect-ratio: 1; max-width: 100%; border: 1px solid var(--line); border-radius: 50%; display: grid; place-content: center; text-align: center; padding: 18px; gap: 6px; transition: background .3s, border-color .3s, transform .3s; min-width: 0; }
-.badge:hover { background: var(--crimson); border-color: var(--crimson); transform: rotate(-4deg); }
-.badge b { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: -.03em; font-size: clamp(18px, 2.2vw, 30px); line-height: 1; }
-.badge span { font-size: 11.5px; color: var(--muted); }
+.recognition-layout { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(0, 1.8fr); align-items: center; gap: clamp(28px, 6vw, 88px); }
+.recognition-copy { min-width: 0; }
+.recognition-copy h2 { font-size: clamp(30px, 3.2vw, 44px); margin-bottom: 18px; }
+.recognition-copy p { max-width: 36ch; color: var(--muted); font-size: 15px; }
+.badges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 22px); }
+.badge { aspect-ratio: 1; max-width: 100%; border: 1px solid rgba(255,255,255,.24); border-radius: 50%; display: grid; align-content: center; justify-items: center; text-align: center; padding: clamp(10px, 1.7vw, 22px); gap: 8px; transition: background .3s, border-color .3s, transform .3s; min-width: 0; background: radial-gradient(circle at 50% 35%, rgba(184,20,20,.14), transparent 68%); }
+.badge:hover { background: var(--crimson); border-color: var(--crimson); transform: translateY(-4px); }
+.badge b { font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: -.03em; font-size: clamp(16px, 1.8vw, 24px); line-height: 1.05; overflow-wrap: anywhere; }
+.badge span { font-size: clamp(10px, .9vw, 12px); line-height: 1.4; color: var(--muted); max-width: 15ch; }
 .badge:hover span { color: #fff; }
 
 /* contact footer */
-.footer { background: var(--crimson); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); padding-block: clamp(64px, 10vw, 140px) 32px; position: relative; overflow: hidden; }
-.footer .tag { color: rgba(255,255,255,.8); }
-.footer h2 { font-size: clamp(60px, 15vw, 240px); letter-spacing: -.05em; line-height: .84; margin-block: 18px clamp(32px, 6vw, 72px); }
+.footer { background: #0d0d0d; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); padding-block: clamp(64px, 10vw, 140px) 32px; position: relative; overflow: hidden; border-top: 8px solid var(--crimson-hi); }
+.footer .tag { color: rgba(255,255,255,.72); }
+.footer h2 { font-size: clamp(36px, 8vw, 112px); letter-spacing: -.045em; line-height: .96; margin-block: 0 clamp(28px, 5vw, 56px); overflow-wrap: anywhere; }
 .footer h2 span { color: transparent; -webkit-text-stroke: 2px #fff; }
-.f-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 6vw, 96px); }
-.f-grid > * { min-width: 0; }
-form { display: flex; flex-direction: column; gap: 16px; }
-label { display: flex; flex-direction: column; gap: 6px; }
-input, textarea { font: inherit; color: #fff; background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.4); border-radius: 8px; padding: 13px 14px; width: 100%; }
-input::placeholder, textarea::placeholder { color: rgba(255,255,255,.55); }
-textarea { min-height: 120px; resize: vertical; }
-.send { align-self: flex-start; background: #0a0a0a; color: #fff; border: 0; border-radius: 999px; padding: 15px 28px; font: 600 15px var(--body); transition: transform .2s; }
-.send:hover { transform: translateY(-2px); }
-.draft { margin-top: 20px; padding: 16px; border: 1px dashed rgba(255,255,255,.6); border-radius: 8px; background: rgba(0,0,0,.2); }
-.draft pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; margin: 10px 0 14px; }
-.rows { display: flex; flex-direction: column; }
-.row { border-top: 1px solid rgba(255,255,255,.35); padding-block: 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rows { display: flex; flex-direction: column; max-width: 680px; }
+.row { border-top: 1px solid rgba(255,255,255,.18); padding-block: 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .row .val { font-size: clamp(18px, 2vw, 26px); overflow-wrap: anywhere; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-weight: 500; }
-a.val:hover { color: #0a0a0a; }
-.copy { font: 500 11px var(--body); letter-spacing: .16em; text-transform: uppercase; background: none; border: 1px solid rgba(255,255,255,.6); color: #fff; border-radius: 999px; padding: 5px 12px; }
-.copy:hover { background: #fff; color: var(--crimson); }
-.foot-line { margin-top: clamp(40px, 6vw, 80px); padding-top: 20px; border-top: 1px solid rgba(255,255,255,.35); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; }
-.hint { margin-top: 8px; font-size: 13px; color: rgba(255,255,255,.8); }
+a.val:hover { color: var(--crimson-hi); }
+.copy { font: 500 11px var(--body); letter-spacing: .16em; text-transform: uppercase; background: none; border: 1px solid rgba(255,255,255,.4); color: #fff; border-radius: 999px; padding: 5px 12px; }
+.copy:hover { background: #fff; color: #0a0a0a; }
+.foot-line { margin-top: clamp(40px, 6vw, 80px); padding-top: 20px; border-top: 1px solid rgba(255,255,255,.18); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; }
 
 @media (max-width: 860px) {
-  .hero-title, .statement, .cards, .f-grid, .pin { grid-template-columns: 1fr; }
+  .hero-title, .statement, .cards, .pin { grid-template-columns: 1fr; }
   .hero-title p { text-align: left; }
   .stats .grid { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
   .stat:nth-child(3) { padding-left: 0; border-left: 0; }
   .project { grid-template-columns: 1fr; }
   .journal { grid-template-columns: 1fr; }
+  .recognition-layout { grid-template-columns: 1fr; }
+  .recognition-copy h2 { max-width: 14ch; }
   .badges { grid-template-columns: repeat(2, 1fr); }
   .status .long { display: none; }
   .ticker { font-size: 10px; letter-spacing: .12em; }
@@ -238,7 +233,7 @@ a.val:hover { color: #0a0a0a; }
   </div>
 </div>
 <div class="progress" id="progress"></div>
-<div class="cursor" id="cursor"><i></i></div>
+<div class="splash-cursor" id="splashCursor" aria-hidden="true"><canvas class="splash-cursor__canvas"></canvas></div>
 
 <div class="menu" id="menu" hidden>
   <div class="menu-top">
@@ -432,41 +427,29 @@ a.val:hover { color: #0a0a0a; }
 </section>
 
 <section id="recognition" style="padding-top:0">
-  <div class="sec-head"><h2>Education &amp; languages</h2><p>BSc Computer Applications, Bharathiar University, Coimbatore, Aug 2021 – Aug 2025.</p></div>
-  <div class="badges">
-    <div class="badge"><b>BCA</b><span>Bharathiar University</span></div>
-    <div class="badge"><b>English</b><span>Professional working</span></div>
-    <div class="badge"><b>Malayalam</b><span>Native</span></div>
-    <div class="badge"><b>Tamil</b><span>Native</span></div>
+  <div class="recognition-layout">
+    <div class="recognition-copy">
+      <h2>Education &amp; languages</h2>
+      <p>BSc Computer Applications, Bharathiar University, Coimbatore, Aug 2021 – Aug 2025.</p>
+    </div>
+    <div class="badges" aria-label="Education and language credentials">
+      <div class="badge"><b>BCA</b><span>Bharathiar University<br>Coimbatore</span></div>
+      <div class="badge"><b>English</b><span>Professional working proficiency</span></div>
+      <div class="badge"><b>Malayalam</b><span>Native proficiency</span></div>
+      <div class="badge"><b>Tamil</b><span>Native proficiency</span></div>
+    </div>
   </div>
 </section>
 </div>
 
 <footer class="footer" id="contact">
   <div class="wrap">
-    <p class="tag">Open to relocate to Dubai / UAE · Valid Indian passport · Immediate joiner</p>
     <h2>Let's <span>connect</span></h2>
-    <div class="f-grid">
-      <div>
-        <form id="form" novalidate>
-          <label><span class="tag">Your name</span><input id="fName" type="text" autocomplete="name" placeholder="Your name"></label>
-          <label><span class="tag">Your email</span><input id="fEmail" type="email" autocomplete="email" placeholder="you@company.com"></label>
-          <label><span class="tag">Message</span><textarea id="fMsg" placeholder="Tell me about the role or project"></textarea></label>
-          <button class="send" type="submit">Write my message</button>
-        </form>
-        <p class="hint">This page can't send email. It writes the message for you to copy and send to the address on the right.</p>
-        <div class="draft" id="draft" hidden>
-          <span class="tag">Your message</span>
-          <pre id="draftText"></pre>
-          <button class="copy" type="button" id="copyDraft">Copy message</button>
-        </div>
-      </div>
-      <div class="rows">
-        <div class="row"><span class="tag">Email</span><span class="val"><span>pradeesh.n.kumar@gmail.com</span><button class="copy" data-copy="pradeesh.n.kumar@gmail.com">Copy</button></span></div>
-        <div class="row"><span class="tag">Phone</span><span class="val"><span>+91-7418647710</span><button class="copy" data-copy="+91-7418647710">Copy</button></span></div>
-        <div class="row"><span class="tag">LinkedIn</span><a class="val" href="https://www.linkedin.com/in/pradeesh-kumar-n" target="_blank" rel="noopener">linkedin.com/in/pradeesh-kumar-n ↗</a></div>
-        <div class="row"><span class="tag">GitHub</span><a class="val" href="https://github.com/pradeesh-kumar-n" target="_blank" rel="noopener">github.com/pradeesh-kumar-n ↗</a></div>
-      </div>
+    <div class="rows">
+      <div class="row"><span class="tag">Email</span><span class="val"><span>pradeesh.n.kumar@gmail.com</span><button class="copy" data-copy="pradeesh.n.kumar@gmail.com">Copy</button></span></div>
+      <div class="row"><span class="tag">Phone</span><span class="val"><span>+91-7418647710</span><button class="copy" data-copy="+91-7418647710">Copy</button></span></div>
+      <div class="row"><span class="tag">LinkedIn</span><a class="val" href="https://www.linkedin.com/in/pradeesh-kumar-n" target="_blank" rel="noopener">linkedin.com/in/pradeesh-kumar-n ↗</a></div>
+      <div class="row"><span class="tag">GitHub</span><a class="val" href="https://github.com/pradeesh-kumar-n" target="_blank" rel="noopener">github.com/pradeesh-kumar-n ↗</a></div>
     </div>
     <div class="foot-line tag"><span>© 2026 Pradeesh Kumar N</span><span>AI Engineer · ML Engineer · Madurai, India</span></div>
   </div>
@@ -494,8 +477,10 @@ a.val:hover { color: #0a0a0a; }
   function copyText(text, btn, label) {
     function done(msg) { var o = btn.textContent; btn.textContent = msg; setTimeout(function () { btn.textContent = label || o; }, 1400); }
     function fallback() {
-      var src = btn.previousElementSibling || document.getElementById("draftText");
-      try { var r = document.createRange(); r.selectNodeContents(src); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {}
+      var src = btn.previousElementSibling;
+      if (src) {
+        try { var r = document.createRange(); r.selectNodeContents(src); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {}
+      }
       done("Selected");
     }
     try { navigator.clipboard.writeText(text).then(function () { done("Copied"); }, fallback); } catch (e) { fallback(); }
@@ -504,31 +489,121 @@ a.val:hover { color: #0a0a0a; }
     b.addEventListener("click", function () { copyText(b.getAttribute("data-copy"), b, "Copy"); });
   });
 
-  // contact form: composes text locally, never sends
-  var draft = document.getElementById("draft"), dt = document.getElementById("draftText"), msgText = "";
-  document.getElementById("form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var n = document.getElementById("fName").value.trim() || "[your name]";
-    var m = document.getElementById("fEmail").value.trim() || "[your email]";
-    var b = document.getElementById("fMsg").value.trim() || "[your message]";
-    msgText = "Hi Pradeesh,\n\n" + b + "\n\nBest,\n" + n + "\n" + m;
-    dt.textContent = msgText; draft.hidden = false;
-  });
-  document.getElementById("copyDraft").addEventListener("click", function () { copyText(msgText, this, "Copy message"); });
+  // Splash cursor
+  var splashOptions = {
+    rainbow: false, size: 1.3, force: 1, swirl: 3, trail: 1.6,
+    clickSplash: true, colorSpeed: 0.6, intensity: 1, momentum: 1,
+    shading: 1, glow: 0, quality: "high", intro: true, contained: false
+  };
+  var splashCanvas = document.querySelector(".splash-cursor__canvas");
+  var splashContext = splashCanvas.getContext("2d");
+  var splashParticles = [], splashWidth = 0, splashHeight = 0, splashDpr = 1, splashFrame = 0;
+  var pointerX = 0, pointerY = 0, previousX = 0, previousY = 0;
+  var splashEnabled = !reduce && !!splashContext && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var splashColors = splashOptions.rainbow ? [0, 45, 100, 180, 250, 310] : [0, 350, 8];
 
-  // lerp cursor
-  var cur = document.getElementById("cursor"), tx = -100, ty = -100, cx = -100, cy = -100;
-  window.addEventListener("pointermove", function (e) {
-    if (e.pointerType !== "mouse") return;
-    tx = e.clientX; ty = e.clientY; cur.classList.add("on");
-    cur.classList.toggle("big", !!e.target.closest("a, button, .project, .card, .badge, .j-card"));
-  });
-  document.addEventListener("pointerleave", function () { cur.classList.remove("on"); });
-  (function loop() {
-    cx += (tx - cx) * 0.18; cy += (ty - cy) * 0.18;
-    cur.style.transform = "translate(" + (cx - 8) + "px," + (cy - 8) + "px)";
-    requestAnimationFrame(loop);
-  })();
+  function resizeSplash() {
+    splashDpr = Math.min(window.devicePixelRatio || 1, splashOptions.quality === "high" ? 2 : 1);
+    splashWidth = window.innerWidth;
+    splashHeight = window.innerHeight;
+    splashCanvas.width = Math.round(splashWidth * splashDpr);
+    splashCanvas.height = Math.round(splashHeight * splashDpr);
+    splashContext.setTransform(splashDpr, 0, 0, splashDpr, 0, 0);
+  }
+
+  function addSplashParticle(x, y, vx, vy, scale, hue) {
+    if (splashParticles.length >= 420) splashParticles.shift();
+    var life = 35 + Math.random() * 30;
+    splashParticles.push({
+      x: x, y: y, vx: vx, vy: vy, life: life, maxLife: life,
+      radius: (2 + Math.random() * 5) * splashOptions.size * scale,
+      hue: hue, phase: Math.random() * Math.PI * 2
+    });
+  }
+
+  function emitSplash(x, y, dx, dy, count, scale) {
+    var speed = Math.hypot(dx, dy) || 1;
+    var angle = Math.atan2(dy, dx);
+    for (var i = 0; i < count; i++) {
+      var spread = angle + Math.PI + (Math.random() - .5) * splashOptions.swirl * .72;
+      var velocity = (.5 + Math.random() * 2.2) * splashOptions.force * scale;
+      var hue = splashColors[Math.floor(Math.random() * splashColors.length)];
+      addSplashParticle(
+        x + (Math.random() - .5) * 8, y + (Math.random() - .5) * 8,
+        Math.cos(spread) * velocity + dx / speed * .9,
+        Math.sin(spread) * velocity + dy / speed * .9,
+        scale, hue
+      );
+    }
+    startSplashAnimation();
+  }
+
+  function drawSplash() {
+    splashFrame = 0;
+    if (!splashEnabled || document.hidden) return;
+    splashContext.clearRect(0, 0, splashWidth, splashHeight);
+    for (var i = splashParticles.length - 1; i >= 0; i--) {
+      var particle = splashParticles[i];
+      particle.life -= 1;
+      if (particle.life <= 0) {
+        splashParticles.splice(i, 1);
+        continue;
+      }
+      var lifeRatio = particle.life / particle.maxLife;
+      particle.phase += .035 * splashOptions.swirl;
+      var swirl = Math.sin(particle.phase) * .035 * splashOptions.swirl;
+      particle.vx = (particle.vx - particle.vy * swirl) * .985 * splashOptions.momentum;
+      particle.vy = (particle.vy + particle.vx * swirl + .025) * .985 * splashOptions.momentum;
+      particle.x += particle.vx * splashOptions.trail;
+      particle.y += particle.vy * splashOptions.trail;
+
+      var radius = particle.radius * (.35 + lifeRatio * .65);
+      var alpha = lifeRatio * .3 * splashOptions.intensity;
+      var hue = particle.hue + (1 - lifeRatio) * splashOptions.colorSpeed * 14;
+      var gradient = splashContext.createRadialGradient(particle.x, particle.y, 0, particle.x, particle.y, radius);
+      gradient.addColorStop(0, "hsla(" + hue + ", 92%, 72%, " + (alpha * splashOptions.shading) + ")");
+      gradient.addColorStop(.42, "hsla(" + hue + ", 88%, 48%, " + (alpha * .55) + ")");
+      gradient.addColorStop(1, "hsla(" + hue + ", 85%, 38%, 0)");
+      splashContext.fillStyle = gradient;
+      splashContext.beginPath();
+      splashContext.arc(particle.x, particle.y, radius, 0, Math.PI * 2);
+      splashContext.fill();
+    }
+    if (splashParticles.length) splashFrame = requestAnimationFrame(drawSplash);
+  }
+
+  function startSplashAnimation() {
+    if (!splashFrame && splashEnabled && !document.hidden) splashFrame = requestAnimationFrame(drawSplash);
+  }
+
+  if (splashEnabled) {
+    document.body.classList.add("splash-cursor-ready");
+    resizeSplash();
+    window.addEventListener("resize", resizeSplash);
+    window.addEventListener("pointermove", function (e) {
+      if (e.pointerType !== "mouse") return;
+      pointerX = e.clientX;
+      pointerY = e.clientY;
+      var dx = pointerX - previousX, dy = pointerY - previousY;
+      var distance = Math.hypot(dx, dy);
+      if (distance > 1) emitSplash(pointerX, pointerY, dx, dy, Math.min(8, Math.ceil(distance / 8)), 1);
+      previousX = pointerX;
+      previousY = pointerY;
+    });
+    window.addEventListener("pointerdown", function (e) {
+      if (!splashOptions.clickSplash || e.pointerType !== "mouse" || e.button !== 0) return;
+      emitSplash(e.clientX, e.clientY, 0, -1, 34, 1.8);
+    });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        if (splashFrame) cancelAnimationFrame(splashFrame);
+        splashFrame = 0;
+      } else startSplashAnimation();
+    });
+    if (splashOptions.intro) setTimeout(function () {
+      emitSplash(splashWidth / 2, splashHeight / 2, 0, -1, 52, 2.2);
+    }, 2200);
+  }
 
   // preloader
   var loader = document.getElementById("loader"), num = document.getElementById("loadNum"), t0 = performance.now();
